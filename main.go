@@ -1,14 +1,14 @@
-package goprojecttest
+package main
 
 import "fmt"
 
 func main() {
-	fmt.Println(TwoSum([]int{2, 8, 7, 123}, 9))
+	fmt.Println(twoSum([]int{2, 8, 7, 123}, 9))
 }
 
-func TwoSum(nums []int, target int) []int {
+func twoSum(nums []int, target int) []int {
 	hashT := make(map[int]int)
-	for i, num := range nums { //i — индекс, num — значение
+	for i, num := range nums {
 		diff := target - num
 		prevIndex, isOk := hashT[diff]
 
