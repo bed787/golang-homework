@@ -1,0 +1,70 @@
+{
+  "openapi": "3.0.3",
+  "info": {"title": "Movies API", "version": "1.0"},
+  "paths": {
+    "/load-movies": {
+      "get": {
+        "summary": "Загрузить фильмы в диапазоне ID",
+        "description": "Обе границы включены. from должен быть не больше to.",
+        "parameters": [
+          {"name": "from", "in": "query", "required": true, "schema": {"type": "integer", "format": "int64", "minimum": 1}},
+          {"name": "to", "in": "query", "required": true, "schema": {"type": "integer", "format": "int64", "minimum": 1}}
+        ],
+        "responses": {
+          "200": {
+            "description": "Все фильмы загружены",
+            "content": {"application/json": {"schema": {"type": "array", "items": {"$ref": "#/components/schemas/Movie"}}}}
+          },
+          "207": {
+            "description": "Часть фильмов загружена. Ошибки указаны в заголовке X-Movie-Errors.",
+            "headers": {"X-Movie-Errors": {"description": "JSON-массив объектов с полями id и message", "schema": {"type": "string"}}},
+            "content": {"application/json": {"schema": {"type": "array", "items": {"$ref": "#/components/schemas/Movie"}}}}
+          },
+          "400": {"$ref": "#/components/responses/Error"},
+          "404": {"$ref": "#/components/responses/Error"},
+          "408": {"$ref": "#/components/responses/Error"},
+          "502": {"$ref": "#/components/responses/Error"},
+          "504": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    },
+    "/last-movie": {
+      "get": {
+        "summary": "Найти последний доступный фильм",
+        "responses": {
+          "200": {
+            "description": "Последний фильм",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Movie"}}}
+          },
+          "404": {"$ref": "#/components/responses/Error"},
+          "408": {"$ref": "#/components/responses/Error"},
+          "502": {"$ref": "#/components/responses/Error"},
+          "504": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Movie": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer", "format": "int64"},
+          "title": {"type": "string"},
+          "year": {"type": "integer", "format": "int32"},
+          "director": {"type": "string"}
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {"error": {"type": "string"}}
+      }
+    },
+    "responses": {
+      "Error": {
+        "description": "400 — неверный диапазон; 404 — фильмы не найдены; 408 — отмена; 502 — ошибка стенда; 504 — таймаут",
+        "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+      }
+    }
+  }
+}
